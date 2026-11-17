@@ -71,7 +71,9 @@ export function Profile({ user, onUpdate, onOpenPosts }: Props) {
         <input placeholder="Title" value={postTitle} onChange={(e) => setPostTitle(e.target.value)} required />
         <textarea placeholder="Body" rows={4} value={postBody} onChange={(e) => setPostBody(e.target.value)} required />
         <button type="submit">Publish</button>{' '}
-        <button type="button" onClick={() => onOpenPosts(user._id)}>View my posts</button>
+        <button type="button" onClick={() => onOpenPosts(user._id)}>
+          View my posts
+        </button>
       </form>
 
       {message && <p>{message}</p>}

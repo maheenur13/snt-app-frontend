@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { api, type Note } from '../api';
-import { Pager, usePaged } from '../paging';
+import { Pager } from '../Pager';
+import { usePaged } from '../usePaged';
 
 export function Notes() {
   const { data, page, setPage, reload, error } = usePaged<Note>('/notes');
@@ -47,7 +48,11 @@ export function Notes() {
         <input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
         <textarea placeholder="Content" rows={4} value={content} onChange={(e) => setContent(e.target.value)} />
         <button type="submit">{editingId ? 'Save changes' : 'Add note'}</button>
-        {editingId && <button type="button" onClick={resetForm}>Cancel</button>}
+        {editingId && (
+          <button type="button" onClick={resetForm}>
+            Cancel
+          </button>
+        )}
       </form>
 
       {(error || actionError) && <p className="error">{error || actionError}</p>}
@@ -59,9 +64,7 @@ export function Notes() {
           <small>Updated {new Date(note.updatedAt).toLocaleString()}</small>
           <p>
             <button onClick={() => startEdit(note)}>Edit</button>{' '}
-            <button
-              onClick={() => confirm('Delete this note?') && run(() => api(`/notes/${note._id}`, 'DELETE'))}
-            >
+            <button onClick={() => confirm('Delete this note?') && run(() => api(`/notes/${note._id}`, 'DELETE'))}>
               Delete
             </button>
           </p>

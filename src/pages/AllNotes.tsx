@@ -1,5 +1,6 @@
 import type { Note } from '../api';
-import { Pager, usePaged } from '../paging';
+import { Pager } from '../Pager';
+import { usePaged } from '../usePaged';
 
 export function AllNotes() {
   const { data, page, setPage, error } = usePaged<Note>('/notes/all');
@@ -14,7 +15,8 @@ export function AllNotes() {
           <h3>{note.title}</h3>
           <p style={{ whiteSpace: 'pre-wrap' }}>{note.content}</p>
           <small>
-            By {typeof note.owner === 'object' && note.owner ? `${note.owner.name} (${note.owner.email})` : 'deleted user'}
+            By{' '}
+            {typeof note.owner === 'object' && note.owner ? `${note.owner.name} (${note.owner.email})` : 'deleted user'}
           </small>
         </article>
       ))}

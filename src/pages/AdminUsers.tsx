@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { api, type User } from '../api';
-import { Pager, usePaged } from '../paging';
+import { Pager } from '../Pager';
+import { usePaged } from '../usePaged';
 
 const emptyForm = { name: '', email: '', password: '', role: 'user' as User['role'] };
 
@@ -69,7 +70,11 @@ export function AdminUsers({ currentUserId }: { currentUserId: string }) {
           </select>
         </p>
         <button type="submit">{editingId ? 'Save changes' : 'Add user'}</button>
-        {editingId && <button type="button" onClick={resetForm}>Cancel</button>}
+        {editingId && (
+          <button type="button" onClick={resetForm}>
+            Cancel
+          </button>
+        )}
       </form>
 
       {(error || actionError) && <p className="error">{error || actionError}</p>}

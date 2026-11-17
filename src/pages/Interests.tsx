@@ -1,4 +1,5 @@
-import { Pager, usePaged } from '../paging';
+import { Pager } from '../Pager';
+import { usePaged } from '../usePaged';
 
 interface InterestGroup {
   interest: string;

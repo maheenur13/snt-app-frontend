@@ -17,6 +17,12 @@ Open `http://localhost:5173`. The Vite dev server proxies `/api` to the backend 
 
 `pnpm build` type-checks and builds to `dist/`.
 
+## Code quality
+
+- `pnpm lint`: ESLint (TypeScript, React hooks)
+- `pnpm format` / `pnpm format:check`: Prettier
+- A Husky pre-commit hook runs lint-staged, which lints and formats only the staged files.
+
 ## What's in it
 
 - **Log in / Register**: stores the JWT in `localStorage` and sends it as a `Bearer` token.
@@ -31,7 +37,8 @@ Open `http://localhost:5173`. The Vite dev server proxies `/api` to the backend 
 ```
 src/
   api.ts        fetch wrapper and shared types
-  paging.tsx    usePaged hook and Pager component
+  usePaged.ts   hook that loads one page of a list
+  Pager.tsx     previous/next page controls
   App.tsx       session handling and tab navigation
   pages/        one component per view
 ```

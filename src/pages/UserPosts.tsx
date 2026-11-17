@@ -1,5 +1,6 @@
 import type { Page, Post } from '../api';
-import { Pager, usePaged } from '../paging';
+import { Pager } from '../Pager';
+import { usePaged } from '../usePaged';
 
 export function UserPosts({ userId }: { userId: string }) {
   const { data, page, setPage, error } = usePaged<Post>(`/users/${userId}/posts`);
