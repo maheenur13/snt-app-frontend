@@ -30,6 +30,8 @@ export interface Page<T> {
 }
 
 const TOKEN_KEY = 'token';
+// set in .env; Vite inlines it at build time, so a production build needs it set before `pnpm build`
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
 export function setToken(token: string | null) {
   if (token) localStorage.setItem(TOKEN_KEY, token);
@@ -42,7 +44,7 @@ export function hasToken() {
 
 export async function api<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   const token = localStorage.getItem(TOKEN_KEY);
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_URL}/api${path}`, {
     method,
     headers: {
       ...(body !== undefined && { 'Content-Type': 'application/json' }),

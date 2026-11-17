@@ -8,14 +8,22 @@ Stack: React, TypeScript, Vite. No router or UI library.
 
 Requirements: Node.js 22+, pnpm, and the backend running on `http://localhost:4000`.
 
+Create a `.env` file in this folder with the backend URL:
+
+```
+VITE_API_URL=http://localhost:4000
+```
+
+Without it, the app uses `http://localhost:4000`. The backend must allow this app's address in its `CLIENT_URL` (default `http://localhost:5173`).
+
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open `http://localhost:5173`. The Vite dev server proxies `/api` to the backend (see `vite.config.ts`), so no CORS setup is needed.
+Open `http://localhost:5173`.
 
-`pnpm build` type-checks and builds to `dist/`.
+`pnpm build` type-checks and builds to `dist/`. Vite writes `VITE_API_URL` into the bundle at build time, so set it before building for production.
 
 ## Code quality
 
