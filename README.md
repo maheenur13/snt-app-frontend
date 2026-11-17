@@ -30,6 +30,7 @@ Open `http://localhost:5173`. Use `localhost` for both the app and `VITE_API_URL
 - `pnpm lint`: ESLint (TypeScript, React hooks)
 - `pnpm format` / `pnpm format:check`: Prettier
 - A Husky pre-commit hook runs lint-staged, which lints and formats only the staged files.
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org) (`feat(ui): ...`, `fix(auth): ...`). A Husky `commit-msg` hook runs commitlint and rejects any other format. Run `pnpm commit` for a guided prompt (commitizen with `@commitlint/cz-commitlint`).
 
 ## What's in it
 
