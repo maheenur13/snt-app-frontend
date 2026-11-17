@@ -10,6 +10,11 @@ export function usePaged<T>(path: string, limit = 10) {
     const separator = path.includes('?') ? '&' : '?';
     api<Page<T>>(`${path}${separator}page=${page}&limit=${limit}`)
       .then((result) => {
+        // e.g. the only item on the last page was deleted: step back instead of showing an empty page
+        if (result.totalPages > 0 && page > result.totalPages) {
+          setPage(result.totalPages);
+          return;
+        }
         setData(result);
         setError('');
       })
