@@ -20,8 +20,7 @@ export function AuthForm({ onLogin }: { onLogin: (user: User) => void }) {
     setError('');
     setSubmitting(true);
     try {
-      const result = await api<{ user: User }>(`/auth/${mode}`, 'POST', values);
-      onLogin(result.user);
+      onLogin(await api<User>(`/auth/${mode}`, 'POST', values));
     } catch (err) {
       setError((err as Error).message);
     } finally {

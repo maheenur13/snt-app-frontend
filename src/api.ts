@@ -60,7 +60,24 @@ function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
+// The backend wraps every response: { success, data, meta? } or { success: false, message }.
+interface Envelope {
+  success: boolean;
+  data?: unknown;
+  meta?: Omit<Page<unknown>, 'items'>;
+  message?: string;
+}
+
 export async function api<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
+  return (await request(path, method, body))?.data as T;
+}
+
+export async function apiPage<T>(path: string): Promise<Page<T>> {
+  const { data, meta } = (await request(path, 'GET'))!;
+  return { items: data as T[], ...meta! };
+}
+
+async function request(path: string, method: string, body?: unknown): Promise<Envelope | undefined> {
   let res = await send(path, method, body);
 
   // The access token lasts 15 minutes. When it runs out, get a new one and retry once.
@@ -69,8 +86,8 @@ export async function api<T>(path: string, method = 'GET', body?: unknown): Prom
     else window.dispatchEvent(new Event(SESSION_EXPIRED));
   }
 
-  if (res.status === 204) return undefined as T;
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.message ?? `Request failed (${res.status})`);
-  return data as T;
+  if (res.status === 204) return undefined;
+  const json: Envelope = await res.json().catch(() => ({ success: false }));
+  if (!res.ok || !json.success) throw new Error(json.message ?? `Request failed (${res.status})`);
+  return json;
 }

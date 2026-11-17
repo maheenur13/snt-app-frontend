@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { api, type Page } from './api';
+import { apiPage, type Page } from './api';
 
 export const PAGE_SIZE = 10;
 
@@ -13,7 +13,7 @@ export function usePaged<T>(path: string) {
   const url = `${path}${path.includes('?') ? '&' : '?'}page=${page}&limit=${PAGE_SIZE}`;
 
   const reload = useCallback(() => {
-    api<Page<T>>(url)
+    apiPage<T>(url)
       .then((result) => {
         // e.g. the only item on the last page was deleted: step back instead of showing an empty page
         if (result.totalPages > 0 && page > result.totalPages) {

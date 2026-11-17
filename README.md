@@ -47,7 +47,7 @@ Every list is paginated by the API (10 per page).
 
 ```
 src/
-  api.ts        fetch wrapper (cookies, refresh and retry) and shared types
+  api.ts        fetch wrapper (cookies, refresh and retry, unwraps the API's { success, data, meta } envelope) and shared types
   main.tsx      Ant Design theme and providers
   usePaged.ts   hook that loads one page of a list
   App.tsx       session handling, layout and menu
