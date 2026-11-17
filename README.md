@@ -33,7 +33,7 @@ Open `http://localhost:5173`. Use `localhost` for both the app and `VITE_API_URL
 
 ## What's in it
 
-- **Log in / Register**: the backend stores the JWT in an httpOnly cookie, so this app never reads or stores the token. Requests use `credentials: 'include'`. When a request gets a 401, the app goes back to the login form.
+- **Log in / Register**: the backend keeps both tokens in httpOnly cookies, so this app never reads or stores them. Requests use `credentials: 'include'`. When a request gets a 401 because the 15-minute access token expired, the app calls `/api/auth/refresh` once and retries the request. If several requests fail at the same time, they share one refresh. Only if the refresh fails does the app go back to the login form.
 - **My notes**: create, edit, delete, and page through your own notes.
 - **Profile & posts**: edit your name and interests, and write posts.
 - **Users by interest**: the grouped view. Click a name to open that user's posts.
