@@ -8,7 +8,7 @@ Stack: React, TypeScript, Vite. No router or UI library.
 
 Requirements: Node.js 22+, pnpm, and the backend running on `http://localhost:4000`.
 
-Create a `.env` file in this folder with the backend URL:
+Copy `env.example` to `.env` and set the backend URL (`.env` is git-ignored):
 
 ```
 VITE_API_URL=http://localhost:4000
