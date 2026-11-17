@@ -120,7 +120,8 @@ export function AdminUsers({ currentUserId }: { currentUserId: string }) {
         onOk={() => form.submit()}
         okText={editing ? 'Save changes' : 'Add user'}
         confirmLoading={saving}
-        destroyOnHidden
+        // keep the form mounted so openModal's setFieldsValue always reaches it
+        forceRender
       >
         <Form form={form} layout="vertical" onFinish={save} requiredMark={false}>
           <Form.Item name="name" label="Name" rules={[{ required: true, whitespace: true, message: 'Enter a name' }]}>
