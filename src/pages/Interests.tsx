@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Card, Empty, Flex, List, Pagination, Typography } from 'antd';
+import { Alert, Badge, Button, Card, Empty, Flex, List, Pagination, theme, Typography } from 'antd';
 import { PAGE_SIZE, usePaged } from '../usePaged';
 
 interface InterestGroup {
@@ -9,6 +9,7 @@ interface InterestGroup {
 
 export function Interests({ onOpenPosts }: { onOpenPosts: (userId: string) => void }) {
   const { data, page, setPage, loading, error } = usePaged<InterestGroup>('/users/by-interest');
+  const { token } = theme.useToken();
 
   return (
     <Flex vertical gap={24}>
@@ -30,7 +31,7 @@ export function Interests({ onOpenPosts }: { onOpenPosts: (userId: string) => vo
             <Card
               size="small"
               title={group.interest}
-              extra={<Badge count={group.count} color="#4f46e5" overflowCount={9999} />}
+              extra={<Badge count={group.count} color={token.colorPrimary} overflowCount={9999} />}
             >
               <Flex wrap gap={4}>
                 {group.users.map((u) => (
