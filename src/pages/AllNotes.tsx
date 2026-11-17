@@ -15,7 +15,9 @@ export function AllNotes() {
         rowKey="_id"
         loading={loading}
         dataSource={data?.items ?? []}
-        scroll={{ x: true }}
+        // fixed layout keeps the column widths; on narrow screens the table scrolls instead of squashing
+        tableLayout="fixed"
+        scroll={{ x: 900 }}
         pagination={{
           current: page,
           pageSize: PAGE_SIZE,
@@ -25,8 +27,25 @@ export function AllNotes() {
           showTotal: (total) => `${total} notes`,
         }}
         columns={[
-          { title: 'Title', dataIndex: 'title', width: 300 },
-          { title: 'Content', dataIndex: 'content', ellipsis: true },
+          {
+            title: 'Title',
+            dataIndex: 'title',
+            width: 240,
+            render: (title: string) => <Typography.Text strong>{title}</Typography.Text>,
+          },
+          {
+            title: 'Content',
+            dataIndex: 'content',
+            render: (content: string) => (
+              <Typography.Paragraph
+                type="secondary"
+                ellipsis={{ rows: 2, tooltip: content }}
+                style={{ margin: 0, whiteSpace: 'pre-line' }}
+              >
+                {content}
+              </Typography.Paragraph>
+            ),
+          },
           {
             title: 'Owner',
             dataIndex: 'owner',
