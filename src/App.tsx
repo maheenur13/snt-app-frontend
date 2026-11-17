@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, hasToken, setToken, type User } from './api';
+import { api, SESSION_EXPIRED, type User } from './api';
 import { AdminUsers } from './pages/AdminUsers';
 import { AllNotes } from './pages/AllNotes';
 import { AuthForm } from './pages/AuthForm';
@@ -12,20 +12,24 @@ type View = 'notes' | 'profile' | 'interests' | 'users' | 'all-notes' | 'posts';
 
 export function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(hasToken());
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>('notes');
   const [postsUserId, setPostsUserId] = useState('');
 
   useEffect(() => {
-    if (!hasToken()) return;
+    // the cookie can't be read from JS, so ask the API whether we're signed in
     api<User>('/users/me')
       .then(setUser)
-      .catch(() => setToken(null))
+      .catch(() => setUser(null))
       .finally(() => setLoading(false));
+
+    const onExpired = () => setUser(null);
+    window.addEventListener(SESSION_EXPIRED, onExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED, onExpired);
   }, []);
 
-  function logout() {
-    setToken(null);
+  async function logout() {
+    await api('/auth/logout', 'POST').catch(() => undefined);
     setUser(null);
     setView('notes');
   }

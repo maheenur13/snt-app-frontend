@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { api, setToken, type User } from '../api';
+import { api, type User } from '../api';
 
 export function AuthForm({ onLogin }: { onLogin: (user: User) => void }) {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -13,8 +13,7 @@ export function AuthForm({ onLogin }: { onLogin: (user: User) => void }) {
     setError('');
     try {
       const body = mode === 'login' ? { email, password } : { name, email, password };
-      const result = await api<{ token: string; user: User }>(`/auth/${mode}`, 'POST', body);
-      setToken(result.token);
+      const result = await api<{ user: User }>(`/auth/${mode}`, 'POST', body);
       onLogin(result.user);
     } catch (err) {
       setError((err as Error).message);

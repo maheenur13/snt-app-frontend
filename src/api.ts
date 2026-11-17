@@ -29,30 +29,22 @@ export interface Page<T> {
   totalPages: number;
 }
 
-const TOKEN_KEY = 'token';
 // set in .env; Vite inlines it at build time, so a production build needs it set before `pnpm build`
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
 
-export function setToken(token: string | null) {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
-}
-
-export function hasToken() {
-  return localStorage.getItem(TOKEN_KEY) !== null;
-}
+// Fired when the session cookie is missing or expired, so the app can show the login form.
+export const SESSION_EXPIRED = 'session-expired';
 
 export async function api<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
-  const token = localStorage.getItem(TOKEN_KEY);
+  // The JWT lives in an httpOnly cookie that this code can't read; the browser attaches it.
   const res = await fetch(`${API_URL}/api${path}`, {
     method,
-    headers: {
-      ...(body !== undefined && { 'Content-Type': 'application/json' }),
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
+    credentials: 'include',
+    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
+  if (res.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event(SESSION_EXPIRED));
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message ?? `Request failed (${res.status})`);
