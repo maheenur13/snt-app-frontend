@@ -1,4 +1,6 @@
-import { useState, type FormEvent } from 'react';
+import { ReadOutlined, SendOutlined } from '@ant-design/icons';
+import { App, Button, Card, Descriptions, Flex, Form, Input, Select, Tag, Typography } from 'antd';
+import { useState } from 'react';
 import { api, type User } from '../api';
 
 interface Props {
@@ -7,77 +9,116 @@ interface Props {
   onOpenPosts: (userId: string) => void;
 }
 
-export function Profile({ user, onUpdate, onOpenPosts }: Props) {
-  const [name, setName] = useState(user.name);
-  const [interests, setInterests] = useState(user.interests.join(', '));
-  const [postTitle, setPostTitle] = useState('');
-  const [postBody, setPostBody] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+interface ProfileValues {
+  name: string;
+  interests: string[];
+}
 
-  async function run(action: () => Promise<void>, success: string) {
-    setError('');
-    setMessage('');
+interface PostValues {
+  title: string;
+  body: string;
+}
+
+export function Profile({ user, onUpdate, onOpenPosts }: Props) {
+  const [profileForm] = Form.useForm<ProfileValues>();
+  const [postForm] = Form.useForm<PostValues>();
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const { message } = App.useApp();
+
+  async function saveProfile(values: ProfileValues) {
+    setSavingProfile(true);
     try {
-      await action();
-      setMessage(success);
+      const updated = await api<User>('/users/me', 'PATCH', values);
+      onUpdate(updated);
+      // the API trims, lower-cases and de-duplicates interests, so show what was saved
+      profileForm.setFieldsValue({ interests: updated.interests });
+      message.success('Profile saved');
     } catch (err) {
-      setError((err as Error).message);
+      message.error((err as Error).message);
+    } finally {
+      setSavingProfile(false);
     }
   }
 
-  function saveProfile(e: FormEvent) {
-    e.preventDefault();
-    run(async () => {
-      const updated = await api<User>('/users/me', 'PATCH', {
-        name,
-        interests: interests.split(','),
-      });
-      onUpdate(updated);
-      setInterests(updated.interests.join(', '));
-    }, 'Profile saved.');
-  }
-
-  function createPost(e: FormEvent) {
-    e.preventDefault();
-    run(async () => {
-      await api('/posts', 'POST', { title: postTitle, body: postBody });
-      setPostTitle('');
-      setPostBody('');
-    }, 'Post published.');
+  async function publish(values: PostValues) {
+    setPublishing(true);
+    try {
+      await api('/posts', 'POST', values);
+      postForm.resetFields();
+      message.success('Post published');
+    } catch (err) {
+      message.error((err as Error).message);
+    } finally {
+      setPublishing(false);
+    }
   }
 
   return (
-    <section>
-      <h2>Profile</h2>
-      <p>{user.email}</p>
-      <form onSubmit={saveProfile} className="card">
-        <p>
-          <label>
-            Name <input value={name} onChange={(e) => setName(e.target.value)} required />
-          </label>
-        </p>
-        <p>
-          <label>
-            Interests (comma separated){' '}
-            <input value={interests} onChange={(e) => setInterests(e.target.value)} placeholder="chess, reading" />
-          </label>
-        </p>
-        <button type="submit">Save profile</button>
-      </form>
+    <Flex vertical gap={24}>
+      <Typography.Title level={3} style={{ margin: 0 }}>
+        Profile
+      </Typography.Title>
 
-      <h2>Write a post</h2>
-      <form onSubmit={createPost} className="card">
-        <input placeholder="Title" value={postTitle} onChange={(e) => setPostTitle(e.target.value)} required />
-        <textarea placeholder="Body" rows={4} value={postBody} onChange={(e) => setPostBody(e.target.value)} required />
-        <button type="submit">Publish</button>{' '}
-        <button type="button" onClick={() => onOpenPosts(user._id)}>
-          View my posts
-        </button>
-      </form>
+      <Card>
+        <Descriptions column={1} size="small" style={{ marginBottom: 16 }}>
+          <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
+          <Descriptions.Item label="Role">
+            <Tag color={user.role === 'admin' ? 'purple' : 'blue'}>{user.role}</Tag>
+          </Descriptions.Item>
+        </Descriptions>
+        <Form
+          form={profileForm}
+          layout="vertical"
+          initialValues={{ name: user.name, interests: user.interests }}
+          onFinish={saveProfile}
+          requiredMark={false}
+        >
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, whitespace: true, message: 'Enter your name' }]}
+          >
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item
+            name="interests"
+            label="Interests"
+            extra="Type an interest and press Enter. Up to 20."
+            rules={[{ type: 'array', max: 20, message: 'At most 20 interests' }]}
+          >
+            <Select mode="tags" placeholder="chess, reading" tokenSeparators={[',']} open={false} />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" loading={savingProfile}>
+            Save profile
+          </Button>
+        </Form>
+      </Card>
 
-      {message && <p>{message}</p>}
-      {error && <p className="error">{error}</p>}
-    </section>
+      <Card
+        title="Write a post"
+        extra={
+          <Button icon={<ReadOutlined />} onClick={() => onOpenPosts(user._id)}>
+            View my posts
+          </Button>
+        }
+      >
+        <Form form={postForm} layout="vertical" onFinish={publish} requiredMark={false}>
+          <Form.Item name="title" label="Title" rules={[{ required: true, whitespace: true, message: 'Add a title' }]}>
+            <Input maxLength={200} />
+          </Form.Item>
+          <Form.Item
+            name="body"
+            label="Body"
+            rules={[{ required: true, whitespace: true, message: 'Write something' }]}
+          >
+            <Input.TextArea rows={4} maxLength={20000} />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" loading={publishing} icon={<SendOutlined />}>
+            Publish
+          </Button>
+        </Form>
+      </Card>
+    </Flex>
   );
 }

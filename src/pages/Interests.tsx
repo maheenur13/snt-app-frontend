@@ -1,5 +1,5 @@
-import { Pager } from '../Pager';
-import { usePaged } from '../usePaged';
+import { Alert, Badge, Button, Card, Empty, Flex, List, Pagination, Typography } from 'antd';
+import { PAGE_SIZE, usePaged } from '../usePaged';
 
 interface InterestGroup {
   interest: string;
@@ -8,27 +8,54 @@ interface InterestGroup {
 }
 
 export function Interests({ onOpenPosts }: { onOpenPosts: (userId: string) => void }) {
-  const { data, page, setPage, error } = usePaged<InterestGroup>('/users/by-interest');
+  const { data, page, setPage, loading, error } = usePaged<InterestGroup>('/users/by-interest');
 
   return (
-    <section>
-      <h2>Users by interest</h2>
-      <p>Click a name to see that user's posts.</p>
-      {error && <p className="error">{error}</p>}
-      {data?.items.length === 0 && <p>Nobody has added interests yet.</p>}
-      {data?.items.map((group) => (
-        <div key={group.interest} className="card">
-          <strong>{group.interest}</strong> ({group.count})
-          <ul>
-            {group.users.map((u) => (
-              <li key={u._id}>
-                <button onClick={() => onOpenPosts(u._id)}>{u.name}</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-      {data && <Pager page={page} totalPages={data.totalPages} onChange={setPage} />}
-    </section>
+    <Flex vertical gap={24}>
+      <div>
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Users by interest
+        </Typography.Title>
+        <Typography.Text type="secondary">Click a name to see that user's posts.</Typography.Text>
+      </div>
+      {error && <Alert type="error" message={error} showIcon />}
+
+      <List
+        loading={loading}
+        grid={{ gutter: 16, xs: 1, sm: 2, md: 3 }}
+        dataSource={data?.items ?? []}
+        locale={{ emptyText: <Empty description="Nobody has added interests yet" /> }}
+        renderItem={(group) => (
+          <List.Item>
+            <Card
+              size="small"
+              title={group.interest}
+              extra={<Badge count={group.count} color="#4f46e5" overflowCount={9999} />}
+            >
+              <Flex wrap gap={4}>
+                {group.users.map((u) => (
+                  <Button key={u._id} size="small" onClick={() => onOpenPosts(u._id)}>
+                    {u.name}
+                  </Button>
+                ))}
+                {group.count > group.users.length && (
+                  <Typography.Text type="secondary">+{group.count - group.users.length} more</Typography.Text>
+                )}
+              </Flex>
+            </Card>
+          </List.Item>
+        )}
+      />
+
+      <Pagination
+        align="center"
+        current={page}
+        pageSize={PAGE_SIZE}
+        total={data?.total ?? 0}
+        onChange={setPage}
+        hideOnSinglePage
+        showSizeChanger={false}
+      />
+    </Flex>
   );
 }

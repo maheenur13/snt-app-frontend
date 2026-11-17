@@ -1,3 +1,13 @@
+import {
+  FileTextOutlined,
+  LockOutlined,
+  LogoutOutlined,
+  ReadOutlined,
+  TagsOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import { Avatar, Button, Flex, Layout, Menu, Spin, Tag, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { api, SESSION_EXPIRED, type User } from './api';
 import { AdminUsers } from './pages/AdminUsers';
@@ -39,38 +49,65 @@ export function App() {
     setView('posts');
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <Flex justify="center" align="center" style={{ minHeight: '100vh' }}>
+        <Spin size="large" />
+      </Flex>
+    );
+  }
   if (!user) return <AuthForm onLogin={setUser} />;
 
-  const tabs: [View, string][] = [
-    ['notes', 'My notes'],
-    ['profile', 'Profile & posts'],
-    ['interests', 'Users by interest'],
+  const menuItems = [
+    { key: 'notes', icon: <FileTextOutlined />, label: 'My notes' },
+    { key: 'profile', icon: <UserOutlined />, label: 'Profile & posts' },
+    { key: 'interests', icon: <TagsOutlined />, label: 'Interests' },
+    ...(user.role === 'admin'
+      ? [
+          { key: 'users', icon: <TeamOutlined />, label: 'Users' },
+          { key: 'all-notes', icon: <ReadOutlined />, label: 'All notes' },
+        ]
+      : []),
   ];
-  if (user.role === 'admin') tabs.push(['users', 'Manage users'], ['all-notes', 'All notes']);
 
   return (
-    <>
-      <header>
-        <p>
-          Signed in as <strong>{user.name}</strong> ({user.role}) <button onClick={logout}>Log out</button>
-        </p>
-        <nav>
-          {tabs.map(([key, label]) => (
-            <button key={key} aria-current={view === key ? 'page' : undefined} onClick={() => setView(key)}>
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
-      <main>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Layout.Header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          background: '#fff',
+          borderBottom: '1px solid #f0f0f0',
+        }}
+      >
+        <Typography.Title level={4} style={{ margin: 0, whiteSpace: 'nowrap' }}>
+          <LockOutlined /> Secure Notes
+        </Typography.Title>
+        <Menu
+          mode="horizontal"
+          selectedKeys={[view]}
+          items={menuItems}
+          onClick={({ key }) => setView(key as View)}
+          style={{ flex: 1, minWidth: 0, borderBottom: 'none' }}
+        />
+        <Flex align="center" gap={8}>
+          <Avatar icon={<UserOutlined />} />
+          <Typography.Text strong>{user.name}</Typography.Text>
+          {user.role === 'admin' && <Tag color="purple">admin</Tag>}
+          <Button icon={<LogoutOutlined />} onClick={logout}>
+            Log out
+          </Button>
+        </Flex>
+      </Layout.Header>
+      <Layout.Content style={{ padding: 24, width: '100%', maxWidth: 1000, margin: '0 auto' }}>
         {view === 'notes' && <Notes />}
         {view === 'profile' && <Profile user={user} onUpdate={setUser} onOpenPosts={openPosts} />}
         {view === 'interests' && <Interests onOpenPosts={openPosts} />}
         {view === 'users' && <AdminUsers currentUserId={user._id} />}
         {view === 'all-notes' && <AllNotes />}
         {view === 'posts' && <UserPosts userId={postsUserId} />}
-      </main>
-    </>
+      </Layout.Content>
+    </Layout>
   );
 }

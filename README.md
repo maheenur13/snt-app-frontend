@@ -1,8 +1,8 @@
 # Secure Notes – Frontend
 
-A minimal React client for the Secure Notes API. The focus is functionality, not styling.
+A React client for the Secure Notes API.
 
-Stack: React, TypeScript, Vite. No router or UI library.
+Stack: React, TypeScript, Vite, Ant Design (components and icons). No router: views are switched with the top menu.
 
 ## Getting started
 
@@ -37,7 +37,7 @@ Open `http://localhost:5173`. Use `localhost` for both the app and `VITE_API_URL
 - **My notes**: create, edit, delete, and page through your own notes.
 - **Profile & posts**: edit your name and interests, and write posts.
 - **Users by interest**: the grouped view. Click a name to open that user's posts.
-- **Manage users** (admin): list, add, edit (including role and password), and delete users.
+- **Users** (admin): a table of users, with a dialog to add or edit one (including role and password) and a confirmation before deleting.
 - **All notes** (admin): everyone's notes with their owner.
 
 ## Structure
@@ -45,8 +45,8 @@ Open `http://localhost:5173`. Use `localhost` for both the app and `VITE_API_URL
 ```
 src/
   api.ts        fetch wrapper and shared types
+  main.tsx      Ant Design theme and providers
   usePaged.ts   hook that loads one page of a list
-  Pager.tsx     previous/next page controls
-  App.tsx       session handling and tab navigation
+  App.tsx       session handling, layout and menu
   pages/        one component per view
 ```
