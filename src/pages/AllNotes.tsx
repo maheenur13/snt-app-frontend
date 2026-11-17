@@ -25,7 +25,7 @@ export function AllNotes() {
           showTotal: (total) => `${total} notes`,
         }}
         columns={[
-          { title: 'Title', dataIndex: 'title', width: 200 },
+          { title: 'Title', dataIndex: 'title', width: 300 },
           { title: 'Content', dataIndex: 'content', ellipsis: true },
           {
             title: 'Owner',
