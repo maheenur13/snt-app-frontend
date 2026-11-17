@@ -29,8 +29,9 @@ export interface Page<T> {
   totalPages: number;
 }
 
-// set in .env; Vite inlines it at build time, so a production build needs it set before `pnpm build`
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000';
+// Production defaults to the same origin: vercel.json proxies /api to the backend, so the
+// SameSite=Strict auth cookies stay first-party. VITE_API_URL overrides it (set at build time).
+const API_URL = import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : '');
 
 // Fired when the session can't be refreshed any more, so the app can show the login form.
 export const SESSION_EXPIRED = 'session-expired';
