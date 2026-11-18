@@ -38,7 +38,7 @@ Open `http://localhost:5173`. Use `localhost` for both the app and `VITE_API_URL
 - **My notes**: create, edit, delete, and page through your own notes.
 - **Profile & posts**: edit your name and interests, and write posts.
 - **Users by interest**: one card per interest with the number of users and their names. Click a name to open that user's posts.
-- **Users** (admin): a table of users, with a dialog to add or edit one (including role and password) and a confirmation before deleting.
+- **Users** (admin): a table of users, with a dialog to add or edit one (including role and password), a confirmation before deleting, and a button to open any user's posts (including users with no interests, who don't appear on the Interests page).
 - **All notes** (admin): everyone's notes with their owner.
 
 Every list is paginated by the API (10 per page).

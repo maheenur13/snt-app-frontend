@@ -104,7 +104,7 @@ export function App() {
         {view === 'notes' && <Notes />}
         {view === 'profile' && <Profile user={user} onUpdate={setUser} onOpenPosts={openPosts} />}
         {view === 'interests' && <Interests onOpenPosts={openPosts} />}
-        {view === 'users' && <AdminUsers currentUserId={user._id} />}
+        {view === 'users' && <AdminUsers currentUserId={user._id} onOpenPosts={openPosts} />}
         {view === 'all-notes' && <AllNotes />}
         {view === 'posts' && <UserPosts userId={postsUserId} />}
       </Layout.Content>

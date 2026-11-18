@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, UserAddOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, ReadOutlined, UserAddOutlined } from '@ant-design/icons';
 import { Alert, App, Button, Flex, Form, Input, Modal, Popconfirm, Select, Table, Tag, Typography } from 'antd';
 import { useState } from 'react';
 import { api, type User } from '../api';
@@ -11,7 +11,13 @@ interface Values {
   role: User['role'];
 }
 
-export function AdminUsers({ currentUserId }: { currentUserId: string }) {
+interface Props {
+  currentUserId: string;
+  // users without interests aren't on the Interests page, so this is how their posts are reached
+  onOpenPosts: (userId: string) => void;
+}
+
+export function AdminUsers({ currentUserId, onOpenPosts }: Props) {
   const { data, page, setPage, reload, loading, error } = usePaged<User>('/users');
   const [form] = Form.useForm<Values>();
   // undefined: modal closed, null: adding a user, User: editing that user
@@ -92,9 +98,16 @@ export function AdminUsers({ currentUserId }: { currentUserId: string }) {
           {
             title: 'Actions',
             key: 'actions',
-            width: 120,
+            width: 160,
             render: (_, user) => (
               <Flex gap={4}>
+                <Button
+                  type="text"
+                  icon={<ReadOutlined />}
+                  onClick={() => onOpenPosts(user._id)}
+                  aria-label="View posts"
+                  title={`See ${user.name}'s posts`}
+                />
                 <Button type="text" icon={<EditOutlined />} onClick={() => openModal(user)} aria-label="Edit user" />
                 {user._id !== currentUserId && (
                   <Popconfirm
